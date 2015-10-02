@@ -1,29 +1,17 @@
-from bs4 import BeautifulSoup
-import re
-import urllib2
-from sys import argv
+from ghost import Ghost
 
-script, filename = argv
+url = "http://www.ebay.com/"
+gh = Ghost()
 
+# We load the main page of ebay
+page, resources = gh.open(url, wait_onload_event=True)
 
-html = urllib2.urlopen("http://" + filename).read()
+# Full the main bar and click on the search button
+gh.set_field_value("#gh-ac", "plane")
+gh.click("#gh-btn")
 
+# Wait for the next page
+gh.wait_for_selector("#e1-15")
 
-soup = BeautifulSoup(html, "html.parser") #Don't know why we need "html.parser". I am just putting this to get rid of the warning sign
-
-text = soup.get_text()
-
-print text
-
-results = soup('a')
-
-print "These are the following e-mails that were retrieved in this following site: %s" %filename
-for tag in results:
-	if re.match(r'\S+@\S+.com|net', tag['href']):
-		print tag['href']
-
-
-
-# '\S+@\S+\.(?:(?:com)|(?:net))'
-
-# '[^@]+@[^@]+\.[^@]+'
+# Save the image of the screen
+gh.capture_to("plane.png")
